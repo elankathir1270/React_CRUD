@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UserForm from "./Components/UserForm";
 import "./App.css";
 import UserDetails from "./Components/UserDetails";
 import axios from "axios";
+import Loader from "./Components/Loader";
 
 function App() {
   let [showForm, setShowForm] = useState(false);
   let [users, setUsers] = useState([]);
+  let [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   function addUserHandler() {
     setShowForm(true);
@@ -35,7 +41,9 @@ function App() {
         user
       )
       .then((res) => {
-        console.log(res.data);
+        //console.log(res.data);
+        fetchUsers();
+        setShowForm(false);
       });
   }
 
@@ -54,6 +62,7 @@ function App() {
     //     setUsers(userData);
     //   });
 
+    setLoading(true);
     axios
       .get("https://reacthttpcrud-default-rtdb.firebaseio.com/users.json")
       .then((res) => {
@@ -66,6 +75,7 @@ function App() {
         }
         //console.log(userData);
         setUsers(userData);
+        setLoading(false);
       });
   }
 
@@ -79,7 +89,8 @@ function App() {
           Get Users
         </button>
       </div>
-      <UserDetails users={users}></UserDetails>
+      {!loading && <UserDetails users={users}></UserDetails>}
+      {loading && <Loader />}
       {showForm && (
         <UserForm closeForm={closeForm} createUser={onCreateUser}></UserForm>
       )}

@@ -8,13 +8,17 @@ import Loader from "./Components/Loader";
 function App() {
   let [showForm, setShowForm] = useState(false);
   let [users, setUsers] = useState([]);
+  let [user, setUser] = useState(null);
   let [loading, setLoading] = useState(false);
+  let [errorMessage, setErrorMessage] = useState(null);
+  let [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   function addUserHandler() {
+    setEditMode(false);
     setShowForm(true);
   }
 
@@ -48,9 +52,16 @@ function App() {
   }
 
   function fetchUsers() {
+    setLoading(true);
+    setErrorMessage(null);
+
     //fetch by default execute get method
     // fetch("https://reacthttpcrud-default-rtdb.firebaseio.com/users.json")
     //   .then((res) => {
+    //     if (!res.ok) {
+    //       throw new Error("Something went wrong");
+    //      //fetch method wont directly send error message so we have to follow this way
+    //     }
     //     return res.json();
     //   })
     //   .then((data) => {
@@ -60,9 +71,13 @@ function App() {
     //     }
     //     //console.log(userData);
     //     setUsers(userData);
+    //     setLoading(false);
+    //   })
+    //   .catch((error) => {
+    //     setErrorMessage(error.message);
+    //     setLoading(false);
     //   });
 
-    setLoading(true);
     axios
       .get("https://reacthttpcrud-default-rtdb.firebaseio.com/users.json")
       .then((res) => {
@@ -76,7 +91,17 @@ function App() {
         //console.log(userData);
         setUsers(userData);
         setLoading(false);
+      })
+      .catch((error) => {
+        setErrorMessage(error.message);
+        setLoading(false);
       });
+  }
+
+  function onEditUser(user) {
+    setEditMode(true);
+    setShowForm(true);
+    setUser(user);
   }
 
   return (
@@ -89,10 +114,18 @@ function App() {
           Get Users
         </button>
       </div>
-      {!loading && <UserDetails users={users}></UserDetails>}
+      {!loading && !errorMessage && (
+        <UserDetails users={users} onEditUser={onEditUser}></UserDetails>
+      )}
+      {errorMessage && <h3 style={{ textAlign: "center" }}>{errorMessage}</h3>}
       {loading && <Loader />}
       {showForm && (
-        <UserForm closeForm={closeForm} createUser={onCreateUser}></UserForm>
+        <UserForm
+          editMode={editMode}
+          closeForm={closeForm}
+          createUser={onCreateUser}
+          user={user}
+        ></UserForm>
       )}
     </div>
   );

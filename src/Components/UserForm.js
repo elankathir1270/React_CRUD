@@ -9,6 +9,7 @@ function UserForm(props) {
   let countryRef = useRef();
   let cityRef = useRef();
   let dateRef = useRef();
+  let genderRef = useRef();
 
   function onCreateUser(event) {
     event.preventDefault();
@@ -20,6 +21,7 @@ function UserForm(props) {
       country: countryRef.current.value,
       city: cityRef.current.value,
       dob: dateRef.current.value,
+      gender: genderRef.current.value,
     };
 
     // console.log(user);
@@ -67,7 +69,7 @@ function UserForm(props) {
               </div>
               <div>
                 <input type="date" placeholder="Date of Birth" ref={dateRef} />
-                <select name="gender">
+                <select name="gender" ref={genderRef}>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Unknown">Unknown</option>

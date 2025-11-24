@@ -2,6 +2,14 @@ import React from "react";
 import "./UserDetails.css";
 
 function UserDetails(props) {
+  function onEditUserClicked(user) {
+    props.onEditUser(user);
+  }
+
+  function onDeleteUserClicked(user) {
+    props.onDeleteUser(user);
+  }
+
   return (
     <div className="user-details">
       <table className="users-table">
@@ -24,8 +32,18 @@ function UserDetails(props) {
               <td>{user.country}</td>
               <td>{user.city}</td>
               <td>
-                <button className="btn btn-primary">Edit</button>
-                <button className="btn btn-danger">Delete </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => onEditUserClicked(user)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => onDeleteUserClicked(user)}
+                >
+                  Delete{" "}
+                </button>
               </td>
             </tr>
           );

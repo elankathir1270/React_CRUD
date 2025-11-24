@@ -6,6 +6,10 @@ function UserDetails(props) {
     props.onEditUser(user);
   }
 
+  function onDeleteUserClicked(user) {
+    props.onDeleteUser(user);
+  }
+
   return (
     <div className="user-details">
       <table className="users-table">
@@ -34,7 +38,12 @@ function UserDetails(props) {
                 >
                   Edit
                 </button>
-                <button className="btn btn-danger">Delete </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => onDeleteUserClicked(user)}
+                >
+                  Delete{" "}
+                </button>
               </td>
             </tr>
           );

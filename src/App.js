@@ -8,7 +8,7 @@ import Loader from "./Components/Loader";
 function App() {
   let [showForm, setShowForm] = useState(false);
   let [users, setUsers] = useState([]);
-  let [user, setUser] = useState(null);
+  let [userToEdit, setUser] = useState(null);
   let [loading, setLoading] = useState(false);
   let [errorMessage, setErrorMessage] = useState(null);
   let [editMode, setEditMode] = useState(false);
@@ -39,16 +39,32 @@ function App() {
     // });
 
     //third party api
-    axios
-      .post(
-        "https://reacthttpcrud-default-rtdb.firebaseio.com/users.json",
-        user
-      )
-      .then((res) => {
-        //console.log(res.data);
-        fetchUsers();
-        setShowForm(false);
-      });
+    if (!editMode) {
+      axios
+        .post(
+          "https://reacthttpcrud-default-rtdb.firebaseio.com/users.json",
+          user
+        )
+        .then((res) => {
+          //console.log(res.data);
+          fetchUsers();
+        });
+    } else {
+      axios
+        .put(
+          `https://reacthttpcrud-default-rtdb.firebaseio.com/users/${userToEdit.id}.json`,
+          user
+        )
+        .then((res) => {
+          //console.log(res.data);
+          fetchUsers();
+        })
+        .catch((error) => {
+          setErrorMessage(error.message);
+        });
+    }
+
+    setShowForm(false);
   }
 
   function fetchUsers() {
@@ -104,6 +120,27 @@ function App() {
     setUser(user);
   }
 
+  function onDeleteUser(user) {
+    let del = window.confirm(
+      `Do you really want ro delete the record of ${user.firstName} ${user.lastName}`
+    );
+    if (del) {
+      axios
+        .delete(
+          `https://reacthttpcrud-default-rtdb.firebaseio.com/users/${user.id}.json`,
+          user
+        )
+        .then((res) => {
+          //console.log(res.data);
+          fetchUsers();
+          setShowForm(false);
+        })
+        .catch((error) => {
+          setErrorMessage(error.message);
+        });
+    }
+  }
+
   return (
     <div>
       <div className="page-header">
@@ -115,7 +152,11 @@ function App() {
         </button>
       </div>
       {!loading && !errorMessage && (
-        <UserDetails users={users} onEditUser={onEditUser}></UserDetails>
+        <UserDetails
+          users={users}
+          onEditUser={onEditUser}
+          onDeleteUser={onDeleteUser}
+        ></UserDetails>
       )}
       {errorMessage && <h3 style={{ textAlign: "center" }}>{errorMessage}</h3>}
       {loading && <Loader />}
@@ -124,7 +165,7 @@ function App() {
           editMode={editMode}
           closeForm={closeForm}
           createUser={onCreateUser}
-          user={user}
+          user={userToEdit}
         ></UserForm>
       )}
     </div>
